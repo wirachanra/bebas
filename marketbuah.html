@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FRUIT MARKET</title>
+    <style>
+      table,
+      th,
+      tr,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Market</h1>
+    Daftar Product
+    <table border="1" cellspacing="0">
+      <thead>
+        <tr>
+          <th style="width: 200px">Name</th>
+          <th style="width: 130px">Price</th>
+          <th style="width: 80px">category</th>
+          <th style="width: 80px">stock</th>
+          <th colspan="2">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anggur</td>
+          <td>20000</td>
+          <td>buah</td>
+          <td>20</td>
+          <td><button>Delete</button></td>
+          <td><button>Add to Cart</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><input type="text" id="pname" /></td>
+          <td><input type="number" id="pprice" required min="1" /></td>
+          <td>
+            <select name="" id="pcategory">
+              <option value="">-Pilih Catetgory-</option>
+              <option value="buah">Buah-buahan</option>
+              <option value="elektronik">Elektronik</option>
+              <option value="fastfood">Fastfood</option>
+            </select>
+          </td>
+          <td><input type="number" id="pstock" required min="1" /></td>
+          <td colspan="2" align="center">
+            <button onclick="addProduct(), refresh()">Add Product</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <br />
+    <span>Cart</span>
+    <table border="1" cellspacing="0">
+      <thead>
+        <tr>
+          <th style="width: 200px">Name</th>
+          <th style="width: 177px">Price</th>
+          <th style="width: 177px">category</th>
+          <th style="width: 177px">qty</th>
+          <th style="width: 145px">Total Harga</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anggur</td>
+          <td>20000</td>
+          <td>buah</td>
+          <td>20</td>
+          <td>300000</td>
+          <td><button>Delete</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">Total Harga Keseluruhan</td>
+          <td colspan="2"><h3></h3></td>
+        </tr>
+        <tr>
+          <td colspan="4">Bayar</td>
+          <td colspan="2">
+            <input type="number" id="bayar" onchange="kembalian()" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">Kembalian</td>
+          <td colspan="2"><h3></h3></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <script>
+      //------------------------------Tambah Produk
+      function addProduct() {
+        var name = document.getElementById("pname").value;
+        var price = document.getElementById("pprice").value;
+        var category = document.getElementById("pcategory").value;
+        var stock = document.getElementById("pstock").value;
+
+        let tambahProduk = new Product(name, price, category, stock);
+
+        if (name == "" || price == "" || category == "" || stock == 0) {
+          alert("Salah satu dari data belum terisi atau kosong");
+        } else if (cekProduk.includes(name)) {
+          alert("Data Produk sudah ada");
+        } else {
+          cekProduk.push(name);
+          dataProduct.push(tambahProduk);
+        }
+
+        renderDataProd();
+      }
+
+      //------------------------------Refresh Input supaya kosong setelah tambah produk
+      function refresh() {
+        document.getElementById("pname").value = "";
+        document.getElementById("pprice").value = "";
+        document.getElementById("pcategory").value = "";
+        document.getElementById("pstock").value = "";
+      }
+
+      //------------------------------Delete Produk
+      function deleteProduct(idx) {
+        cekProduk.splice(idx, 1);
+        dataProduct.splice(idx, 1);
+        renderDataProd();
+      }
+
+      //------------------------------Delete Keranjang
+      function deleteKeranjang(idxk) {
+        cekKeranjang.splice(idxk, 1);
+        dataKeranjang.splice(idxk, 1);
+
+        // document.getElementsByTagName("h3")[0].innerHTML = "";
+
+        renderDataProd();
+        renderDataKeranjang();
+      }
+
+      //------------------------------Tambah Kekeranjang
+      function addKeranjang(idx) {
+        let namaprod = dataProduct[idx].name;
+        let sistok = dataProduct[idx].stock;
+        let hargaprod = dataProduct[idx].price;
+        let cateprod = dataProduct[idx].category;
+        var validasiAngka = /^[0-9]+$/;
+        
+        let temp =  dataKeranjang
+          .map(function (x) {
+            return x.namek;
+          })
+        console.log(temp)
+
+       
+        cekKeranjang = temp.includes(namaprod);
+        let checkQty = dataKeranjang[temp.indexOf(namaprod)] ? dataKeranjang[temp.indexOf(namaprod)].qtyk : 0
+        
+        // let cekqty;
+        //   for (var i = 0; i < dataKeranjang.length; i++) {
+        //     namaDataKeranjang += dataKeranjang[i].namek;
+        //   }
+        //   cekqty = dataKeranjang[namaDataKeranjang.indexOf(namaprod)].qtyk
+
+        // let cekqty = dataKeranjang.indexOf(namaprod)
+        
+        //ambil data qty keranjang
+
+        let inputQty = prompt(
+          `Produk : ${namaprod}\nStok : ${sistok}\nMasukkan QTY yang ingin dibeli :`
+        );
+        let stokterbaru = parseInt(sistok) - parseInt(inputQty);
+        let totalharga = parseInt(inputQty) * parseInt(hargaprod);
+        let qtykeranjangupdate = parseInt(checkQty) + parseInt(inputQty);
+        let tothargabaru = parseInt(qtykeranjangupdate) * parseInt(hargaprod);
+
+        if (inputQty == "" || inputQty <= 0) {
+          alert("Maaf silahkan diisi qty nya terlebih dahulu");
+        } else if (!inputQty.match(validasiAngka)) {
+          alert("Data yang boleh diisi hanya angka saja");
+        } else if (inputQty > sistok) {
+          alert("Stok Produk tidak mencukupi");
+        } else if (cekKeranjang) {
+          dataKeranjang[temp.indexOf(namaprod)].qtyk  = 
+          parseInt(dataKeranjang[temp.indexOf(namaprod)].qtyk) + parseInt(inputQty)
+          dataProduct[idx].stock -= parseInt(inputQty)
+          // let tambahkekeranjangup = new Keranjang(
+          //   namaprod,
+          //   hargaprod,
+          //   cateprod,
+          //   qtykeranjangupdate,
+          //   tothargabaru
+          // );
+
+          // dataProduct.splice(idx, 1);
+          // let updatestok = new Product(
+          //   namaprod,
+          //   hargaprod,
+          //   cateprod,
+          //   stokterbaru
+          // );
+          // dataProduct.push(updatestok);
+
+          // dataKeranjang.push(tambahkekeranjangup);
+
+
+          totalHargaKeranjang.push(tothargabaru);
+
+          let totalseluruh = 0;
+          for (var i = 0; i < dataKeranjang.length; i++) {
+            totalseluruh += dataKeranjang[i].tothargak;
+          }
+          document.getElementsByTagName("h3")[0].innerHTML =
+            totalseluruh.toLocaleString();
+
+          renderDataProd();
+          renderDataKeranjang();
+        } 
+        else {
+          {
+            let tambahkekeranjang = new Keranjang(
+              namaprod,
+              hargaprod,
+              cateprod,
+              inputQty,
+              totalharga,
+            );
+
+            dataProduct.splice(idx, 1);
+            let updatestok = new Product(
+              namaprod,
+              hargaprod,
+              cateprod,
+              stokterbaru
+            );
+            dataProduct.push(updatestok);
+            // cekKeranjang.push(namaprod);
+            dataKeranjang.push(tambahkekeranjang);
+
+            totalHargaKeranjang.push(totalharga);
+
+            let totalseluruh = 0;
+            for (var i = 0; i < dataKeranjang.length; i++) {
+              totalseluruh += dataKeranjang[i].tothargak;
+            }
+            document.getElementsByTagName("h3")[0].innerHTML =
+              totalseluruh.toLocaleString();
+
+            renderDataProd();
+            renderDataKeranjang();
+          }
+        }
+      }
+
+      //------------------------------Kembalian
+      function kembalian() {
+        var bayar = document.getElementById("bayar").value;
+        let total = 0;
+        for (var i = 0; i < totalHargaKeranjang.length; i++) {
+          total += totalHargaKeranjang[i];
+        }
+        let kembaliannya = parseInt(bayar) - parseInt(total);
+        document.getElementsByTagName("h3")[1].innerHTML =
+          kembaliannya.toLocaleString();
+      }
+
+      //------------------------------Class Product
+      class Product {
+        constructor(name, price, category, stock) {
+          this.name = name;
+          this.price = price;
+          this.category = category;
+          this.stock = stock;
+        }
+      }
+
+      //------------------------------Class keranjang
+      class Keranjang {
+        constructor(namek, pricek, categoryk, qtyk, tothargak) {
+          this.namek = namek;
+          this.pricek = pricek;
+          this.categoryk = categoryk;
+          this.qtyk = qtyk;
+          this.tothargak = tothargak;
+        }
+      }
+
+      //------------------------------Data Product
+      const dataProduct = [
+        new Product("pisang", 12000, "buah", 20),
+        new Product("burger", 10000, "fastfood", 15),
+        new Product("laptop", 8000000, "elektronik", 10),
+      ];
+
+      //------------------------------Data Keranjang
+      const dataKeranjang = [];
+
+      //------------------------------Cek Nama Produk, Kategori dan keranjang
+      let cekProduk = ["pisang", "burger", "laptop"];
+      let cekKategori = [];
+      for (let i = 0; i < dataProduct; i++) {
+        cekProduk.push(dataProduct[i].name);
+        cekKategori.push(dataProduct[i].category);
+      }
+      let cekKategori2 = new Set(cekKategori);
+      let filterKategori = [...cekKategori2];
+      let totalHargaKeranjang = [];
+
+      //------------------------------panggil / tampil data Produk
+      function renderDataProd() {
+        let htmlResult = "";
+        dataProduct.forEach(
+          (item, idx) =>
+            (htmlResult += `<tr>
+            <td>${item.name}</td>
+            <td>${item.price.toLocaleString()}</td>
+            <td>${item.category}</td>
+            <td>${item.stock}</td>
+            <td><button onclick="deleteProduct(${idx})">Delete</button></td>
+            <td><button onclick="addKeranjang(${idx})">Add to Cart</button></td>
+            </tr>`)
+        );
+        document.getElementsByTagName("tbody")[0].innerHTML = htmlResult;
+      }
+      renderDataProd();
+
+      //------------------------------panggil / tampil data keranjang
+      function renderDataKeranjang() {
+        let htmlResultKeranjang = "";
+        dataKeranjang.forEach(
+          (itemk, idxk) =>
+            (htmlResultKeranjang += `<tr>
+            <td>${itemk.namek}</td>
+            <td>${itemk.pricek.toLocaleString()}</td>
+            <td>${itemk.categoryk}</td>
+            <td>${itemk.qtyk}</td>
+            <td>${itemk.tothargak.toLocaleString()}</td>
+            <td><button onclick="deleteKeranjang(${idxk})">Delete</button></td>
+            </tr>`)
+        );
+        document.getElementsByTagName("tbody")[1].innerHTML =
+          htmlResultKeranjang;
+      }
+      renderDataKeranjang();
+    </script>
+  </body>
+</html>
