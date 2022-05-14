@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MINI MARKET</title>
+    <style>
+      table,
+      th,
+      tr,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Market</h1>
+    <!-- ====================================Tabel Data Product==================================== -->
+    Daftar Product
+    <table border="1" cellspacing="0">
+      <thead bgcolor="#999999">
+        <tr>
+          <th style="width: 200px">Name</th>
+          <th style="width: 130px">Price</th>
+          <th style="width: 160px">category</th>
+          <th style="width: 80px">stock</th>
+          <th colspan="2">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anggur</td>
+          <td>20000</td>
+          <td>buah</td>
+          <td>20</td>
+          <td><button>Delete</button></td>
+          <td><button>Add to Cart</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><input type="text" style="width:192px;" id="pname" placeholder="Nama Product"/></td>
+          <td><input type="number" style="width:150px;" id="pprice" required min="1" placeholder="Harga"/></td>
+          <td align="center">
+            <select name="" id="pcategory">
+              <option value="">-Pilih Catetgory-</option>
+              <option value="Buah buahan">Buah-buahan</option>
+              <option value="elektronik">Elektronik</option>
+              <option value="fastfood">Fastfood</option>
+              <option value="Perabot">Perabot</option>
+              <option value="Mainan">Elektronik</option>
+              <option value="Lain-lain">Lain-lain</option>
+            </select>
+          </td>
+          <td><input type="number" id="pstock" style="width:100px;" required min="1" placeholder="Qty Stock"/></td>
+          <td colspan="2" align="center">
+            <button onclick="addProduct(), refresh()">Add Product</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- ====================================Tabel Cart==================================== -->
+    <br />
+    <span>Cart</span>
+    <table border="1" cellspacing="0">
+      <thead>
+        <tr bgcolor="#999999">
+          <th style="width: 200px">Name</th>
+          <th style="width: 158px">Price</th>
+          <th style="width: 160px">category</th>
+          <th style="width: 110px">qty</th>
+          <th style="width: 145px">Total Harga</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anggur</td>
+          <td>20000</td>
+          <td>buah</td>
+          <td>20</td>
+          <td>300000</td>
+          <td><button>Delete</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">Total Harga Keseluruhan</td>
+          <td colspan="2" align="right"><h2>Rp 0</h2></td>
+        </tr>
+        <tr>
+          <td colspan="4">Bayar</td>
+          <td colspan="2" align="right">
+            <input type="number" id="bayar" style="width:190px;" onchange="kembalian()" required min="0" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4" >Kembalian</td>
+          <td colspan="2" align="right"><h2></h2></td> 
+        </tr>
+      </tfoot>
+    </table>
+      <br>
+      <button onclick="checkOut()">Check Out</button>
+
+    <script>
+      //===========================================================================Tambah Produk
+      function addProduct() {
+        var name = document.getElementById("pname").value;
+        var price = document.getElementById("pprice").value;
+        var category = document.getElementById("pcategory").value;
+        var stock = document.getElementById("pstock").value;
+
+        let tambahProduk = new Product(name, price, category, stock);
+
+        if (name == "" || price == "" || category == "" || stock <= 0)
+        {
+          alert("Salah satu dari data belum terisi atau kosong / Qty tidak boleh Minus");
+        } else if (cekProduk.includes(name)) {
+          alert("Data Produk sudah ada");
+        } else {
+          cekProduk.push(name);
+          dataProduct.push(tambahProduk);
+        }
+
+        renderDataProd();
+      }
+
+      //===========================================================================Refresh Input supaya kosong setelah tambah produk
+      function refresh() {
+        document.getElementById("pname").value = "";
+        document.getElementById("pprice").value = "";
+        document.getElementById("pcategory").value = "";
+        document.getElementById("pstock").value = "";
+      }
+
+      //===========================================================================Check Out keranjang
+      function checkOut() {
+        let maubayar = document.getElementById("bayar").value
+
+        let totalseluruh = 0;
+        for (var i = 0; i < dataKeranjang.length; i++) {
+          totalseluruh += dataKeranjang[i].tothargak;
+        }
+
+        document.getElementsByTagName("h2")[0].innerHTML = "Rp " + totalseluruh.toLocaleString();
+
+        if(totalseluruh == 0 && maubayar >= 0)
+        {
+          alert("Data keranjang masih kosong")
+          window.location.reload();
+          // renderDataProd();
+          // renderDataKeranjang();
+        }
+        else if(maubayar == "" || maubayar <= 0)
+        {alert("Input Pembayaran masih kosong")}
+        else if(totalseluruh > maubayar)
+        {alert("Pembayaran tidak cukup")}
+        else{
+          window.location.reload();
+          // renderDataProd();
+          // renderDataKeranjang();
+        }
+      }
+
+      //===========================================================================Delete Produk
+      function deleteProduct(idx) {
+        cekProduk.splice(idx, 1);
+        dataProduct.splice(idx, 1);
+        renderDataProd();
+      }
+
+      //===========================================================================Delete Keranjang
+      function deleteKeranjang(idxk) {
+        // ambil terlebih dahulu data qty dari keranjang yang ingin dihapus
+        let namaProdDel = dataKeranjang[idxk].namek;
+        let qtyKeranjangDel = dataKeranjang[idxk].qtyk;
+
+        //ambil index dari produk untuk mengembalikan stok
+        let temp =  dataProduct
+          .map(function (x) {
+            return x.name;
+          })
+
+        dataProduct[temp.indexOf(namaProdDel)].stock = parseInt(qtyKeranjangDel) + parseInt(dataProduct[temp.indexOf(namaProdDel)].stock)
+        
+        dataKeranjang.splice(idxk, 1);
+
+        let totalseluruh = 0;
+          for (var i = 0; i < dataKeranjang.length; i++) {
+            totalseluruh += dataKeranjang[i].tothargak;
+          }
+        document.getElementsByTagName("h2")[0].innerHTML = "Rp " + totalseluruh.toLocaleString();
+
+        renderDataProd();
+        renderDataKeranjang();
+      }
+
+      //===========================================================================Tambah Kekeranjang
+      function addKeranjang(idx) {
+        let namaprod = dataProduct[idx].name;
+        let sistok = dataProduct[idx].stock;
+        let hargaprod = dataProduct[idx].price;
+        let cateprod = dataProduct[idx].category;
+        var validasiAngka = /^[0-9]+$/;
+        
+        let temp =  dataKeranjang
+          .map(function (x) {
+            return x.namek;
+          })
+        // console.log(temp)
+
+        cekKeranjang = temp.includes(namaprod);
+        let checkQty = dataKeranjang[temp.indexOf(namaprod)] ? dataKeranjang[temp.indexOf(namaprod)].qtyk : 0
+
+        let inputQty = prompt(
+          `Produk : ${namaprod}\nStok : ${sistok}\nMasukkan QTY yang ingin dibeli :`
+        );
+        //data ketika keranjang input data baru
+        let stokterbaru = parseInt(sistok) - parseInt(inputQty);
+        let totalharga = parseInt(inputQty) * parseInt(hargaprod);
+
+        //data ketika didalam keranjang sudah ada produk yang sama maka akan update stok dan total harga
+        let qtykeranjangupdate = parseInt(checkQty) + parseInt(inputQty);
+        let tothargabaru = parseInt(qtykeranjangupdate) * parseInt(hargaprod);
+
+        if (inputQty == "" || inputQty <= 0) {
+          alert("Maaf silahkan diisi qty nya terlebih dahulu");
+        } else if (!inputQty.match(validasiAngka)) {
+          alert("Data yang boleh diisi hanya angka saja");
+        } else if (inputQty > sistok) {
+          alert("Stok Produk tidak mencukupi");
+        } else if (cekKeranjang) {
+          dataKeranjang[temp.indexOf(namaprod)].qtyk  = 
+          parseInt(dataKeranjang[temp.indexOf(namaprod)].qtyk) + parseInt(inputQty)
+          dataProduct[idx].stock -= parseInt(inputQty)
+          
+          dataKeranjang[temp.indexOf(namaprod)].tothargak  = 
+          (parseInt(dataKeranjang[temp.indexOf(namaprod)].qtyk) + parseInt(inputQty)) * hargaprod
+
+          let totalseluruh = 0;
+          for (var i = 0; i < dataKeranjang.length; i++) {
+            totalseluruh += dataKeranjang[i].tothargak;
+          }
+          document.getElementsByTagName("h2")[0].innerHTML =
+            totalseluruh.toLocaleString();
+
+          renderDataProd();
+          renderDataKeranjang();
+        } 
+        else {
+          {
+            let tambahkekeranjang = new Keranjang(
+              namaprod,
+              hargaprod,
+              cateprod,
+              inputQty,
+              totalharga,
+            );
+
+            // dataProduct.splice(idx, 1);
+            // let updatestok = new Product(
+            //   namaprod,
+            //   hargaprod,
+            //   cateprod,
+            //   stokterbaru
+            // );
+            // dataProduct.push(updatestok);
+            // cekKeranjang.push(namaprod);
+
+            dataProduct[idx].stock = stokterbaru // Update stok produk ketika kita memasukkan ke keranjang
+            dataKeranjang.push(tambahkekeranjang); // simpan data ke data keranjang
+
+            let totalseluruh = 0;
+            for (var i = 0; i < dataKeranjang.length; i++) {
+              totalseluruh += dataKeranjang[i].tothargak;
+            }
+            document.getElementsByTagName("h2")[0].innerHTML = "Rp " + totalseluruh.toLocaleString();
+
+            renderDataProd();
+            renderDataKeranjang();
+          }
+        }
+      }
+
+      //===========================================================================Kembalian
+      function kembalian() {
+        var bayar = document.getElementById("bayar").value;
+        let total = 0;
+        for (var i = 0; i < dataKeranjang.length; i++) {
+          total += dataKeranjang[i].tothargak;
+        }
+        let kembaliannya = parseInt(bayar) - parseInt(total);
+        document.getElementsByTagName("h2")[1].innerHTML =
+          "Rp " + kembaliannya.toLocaleString();
+      }
+
+      //===========================================================================Class Product
+      class Product {
+        constructor(name, price, category, stock) {
+          this.name = name;
+          this.price = price;
+          this.category = category;
+          this.stock = stock;
+        }
+      }
+
+      //===========================================================================Class keranjang
+      class Keranjang {
+        constructor(namek, pricek, categoryk, qtyk, tothargak) {
+          this.namek = namek;
+          this.pricek = pricek;
+          this.categoryk = categoryk;
+          this.qtyk = qtyk;
+          this.tothargak = tothargak;
+        }
+      }
+
+      //===========================================================================Isi Data Product
+      const dataProduct = [
+        new Product("pisang", 12000, "Buah buahan", 20),
+        new Product("burger", 10000, "fastfood", 15),
+        new Product("Kipas Mini", 50000, "elektronik", 10),
+        new Product("Mangga", 12000, "Buah buahan", 30),
+        new Product("Mi Goreng", 10000, "fastfood", 15),
+        new Product("Lampu", 35000, "elektronik", 10),
+      ];
+
+      //===========================================================================Data Keranjang
+      const dataKeranjang = [];
+
+      //===========================================================================Cek Nama Produk, Kategori dan keranjang
+      let cekProduk = ["pisang", "burger", "Kipas Mini", "Mangga", "Mi Goreng", "Lampu"];
+      let cekKategori = [];
+      for (let i = 0; i < dataProduct; i++) {
+        cekProduk.push(dataProduct[i].name);
+        cekKategori.push(dataProduct[i].category);
+      }
+      let cekKategori2 = new Set(cekKategori);
+      let filterKategori = [...cekKategori2];
+
+      //===========================================================================panggil / tampil data Produk
+      function renderDataProd() {
+        let htmlResult = "";
+        dataProduct.forEach(
+          (item, idx) =>
+            (htmlResult += `<tr>
+            <td>${item.name}</td>
+            <td align="right">Rp ${item.price.toLocaleString()}</td>
+            <td align="center">${item.category}</td>
+            <td align="right">${item.stock}</td>
+            <td>&nbsp;<button onclick="deleteProduct(${idx})">Delete</button>&nbsp;</td>
+            <td>&nbsp;<button onclick="addKeranjang(${idx})">Add to Cart</button>&nbsp;</td>
+            </tr>`)
+        );
+        document.getElementsByTagName("tbody")[0].innerHTML = htmlResult;
+      }
+      renderDataProd();
+
+      //===========================================================================panggil / tampil data keranjang
+      function renderDataKeranjang(editIdx) {
+        let htmlResultKeranjang = "";
+        dataKeranjang.forEach((itemk, idxk) => 
+          {
+            if (editIdx == idxk){
+            htmlResultKeranjang += 
+            `<tr>
+            <td>${itemk.namek}</td>
+            <td align="right"><input type="number" id="harga" hidden required min="0" value="${itemk.pricek}"/>Rp ${itemk.pricek.toLocaleString()}</td>
+            <td>${itemk.categoryk}</td>
+            <td align="right"><input type="number" id="qtyKeranjang" onfocus="" style="width:150px;" required max="${itemk.qtyk}" min="0" value="${itemk.qtyk}" autofocus/></td>
+            <td align="right">Rp ${itemk.tothargak.toLocaleString()}</td>
+            <td>&nbsp;<button onclick="saveEdit(${idxk})">Save</button> <button onclick="renderDataKeranjang()">Cancel</button>&nbsp;</td>
+            </tr>`
+          } else {
+            htmlResultKeranjang += 
+            `<tr>
+            <td>${itemk.namek}</td>
+            <td align="right">Rp ${itemk.pricek.toLocaleString()}</td>
+            <td>${itemk.categoryk}</td>
+            <td align="right">${itemk.qtyk}</td>
+            <td align="right">Rp ${itemk.tothargak.toLocaleString()}</td>
+            <td>&nbsp;<button onclick="deleteKeranjang(${idxk})">Delete</button> <button onclick="renderDataKeranjang(${idxk})">Edit</button>&nbsp;</td>
+            </tr>`
+          }
+          });
+
+        document.getElementsByTagName("tbody")[1].innerHTML = htmlResultKeranjang;
+      }
+
+      //===========================================================================Save Data Edit
+      function saveEdit(idxk) {
+        let qtySave = parseInt(document.getElementById("qtyKeranjang").value)
+        let hargaSave = parseInt(document.getElementById("harga").value)
+
+        // ambil data Lama dari keranjang
+        let nameSave = dataKeranjang[idxk].namek
+        let qtySave2 = dataKeranjang[idxk].qtyk
+
+        // ambil data idx produk
+        let temp = dataProduct.map(function(x){return x.name})
+        
+        // Hitung data
+        let qtySave3 = parseInt(qtySave2) - parseInt(qtySave)
+        let qtyStokUpdate = parseInt(dataProduct[temp.indexOf(nameSave)].stock) + parseInt(qtySave3)
+        let hargaSave3 = parseInt(qtySave) * parseInt(hargaSave)
+
+        if(qtySave <= 0 || qtySave == ""){
+          alert("Maaf data yang anda input salah / Data tidak boleh kosong atau 0")
+        }
+        else if(qtySave >  qtySave2)
+        {
+          alert("Maaf data yang anda input salah / Melebihi data qty Keranjang")
+        }
+        else
+        { 
+          dataProduct[temp.indexOf(nameSave)].stock = qtyStokUpdate
+          dataKeranjang[idxk].qtyk = qtySave
+          dataKeranjang[idxk].tothargak = hargaSave3
+
+          let totalseluruh = 0;
+            for (var i = 0; i < dataKeranjang.length; i++) {
+              totalseluruh += dataKeranjang[i].tothargak;
+            }
+            document.getElementsByTagName("h2")[0].innerHTML = "Rp " + totalseluruh.toLocaleString();
+
+        }
+        renderDataKeranjang();
+        renderDataProd();
+      }
+
+      renderDataKeranjang();
+    </script>
+  </body>
+</html>
